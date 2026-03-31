@@ -3,12 +3,14 @@
 ## Description
 
 This project is a backend for the Todo App, using Python and Flask library and MySQL for database, with features such as
-authentication, JWT, and data persistence
+authentication, JWT, data persistence, rate limiting, blacklist, CORS, etc.
 
 ## Tech Stack
 
 - Python
 - Flask 
+- flask-limiter
+- flask-CORS
 - Bcrypt
 - SQLalchemy
 - Marshmallow
@@ -22,6 +24,7 @@ authentication, JWT, and data persistence
 
 - (POST) /api/auth/register - Register User
 - (POST) /api/auth/login - Login User
+- (DELETE) /api/auth/logout - Logout User
 - (POST) /api/auth/refresh - Refresh token
 
 ### todo routes
@@ -47,3 +50,4 @@ authentication, JWT, and data persistence
 - Flask: Small project, no need for all the advantages of Django
 - HTTP-only cookies: Protection againsts XSS attacks, no JavaScript access
 - UUID: Harder to brute force compared to incremental IDs
+- Blacklist: Integrated into database to persist revoked tokens

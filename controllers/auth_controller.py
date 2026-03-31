@@ -1,10 +1,12 @@
+from datetime import datetime, timezone
 import uuid
 from flask import make_response, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, decode_token, get_jwt, get_jwt_identity
 from marshmallow import ValidationError
 from database.db import db
 from database.extensions import bcrypt
 from models.user import User
+from models.blacklist import Blacklist
 from schemas.auth_schema import UserSchema
 
 def register():
@@ -71,6 +73,25 @@ def login():
         return response
 
     return  jsonify({"message": "Invalid credentials"}), 404
+
+def logout():
+    # Get access token jti
+    access_jti = get_jwt()['jti']
+    expiration_access = datetime.fromtimestamp(get_jwt()['exp'], tz=timezone.utc)
+
+    # Get refresh token jti from cookie
+    refresh_cookie = request.cookies.get('refresh_token')
+    refresh_token = decode_token(refresh_cookie)
+    refresh_jti = refresh_token['jti']
+    expiration_refresh = datetime.fromtimestamp(refresh_token['exp'], tz=timezone.utc)
+
+    # Add tokens to blacklist and logout user
+    logout_access = Blacklist(jti=access_jti, expired_at=expiration_access)
+    logout_refresh = Blacklist(jti=refresh_jti, expired_at=expiration_refresh)
+    db.session.add(logout_access)
+    db.session.add(logout_refresh)
+    db.session.commit()
+    return jsonify({"message": "Logout successful"}), 200
 
 def refresh():
     # Generate acess token using refresh token
