@@ -1,11 +1,14 @@
+from logging.handlers import RotatingFileHandler
 import os
+import logging
 from datetime import timedelta
 from flask import Flask, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
 
 from database.db import db
-from database.extensions import bcrypt, jwt, limiter
+from database.extensions import bcrypt, jwt, limiter, scheduler
+from helpers.cleanup import Cleanup
 from models.user import User
 from models.todo import Todo
 from models.blacklist import Blacklist
@@ -25,6 +28,11 @@ db_name= os.getenv("DB_NAME")
 # Start App
 todoApp = Flask(__name__)
 
+# Log configurations
+handler = RotatingFileHandler("todo_app.log", maxBytes=5000000, backupCount=3)
+handler.setLevel(logging.ERROR)
+todoApp.logger.addHandler(handler)
+
 # CORS
 CORS(todoApp)
 
@@ -38,6 +46,9 @@ db.init_app(todoApp)
 bcrypt.init_app(todoApp)
 jwt.init_app(todoApp)
 limiter.init_app(todoApp)
+scheduler.init_app(todoApp)
+scheduler.start()
+scheduler.add_job(id='cleanup', func=Cleanup, trigger='interval', hours=24, args=[todoApp])
 init_jwt_handlers(jwt)
 
 # Create db tables
