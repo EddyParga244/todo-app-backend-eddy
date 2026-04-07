@@ -10,11 +10,11 @@ def init_jwt_handlers(jwt):
 
     @jwt.invalid_token_loader
     def invalid_callback(_error):
-        return jsonify({"message": "Token is invalid"}), 400
+        return jsonify({"message": "Token is invalid"}), 422
 
     @jwt.expired_token_loader
     def expired_callback(_header, _data):
-        return jsonify({"message": "Token is expired"}), 400
+        return jsonify({"message": "Token is expired"}), 401
 
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(_header, jwt_payload: dict) -> bool:
