@@ -24,6 +24,7 @@ db_host= os.getenv("DB_HOST")
 db_user= os.getenv("DB_USER")
 db_password= os.getenv("DB_PASSWORD")
 db_name= os.getenv("DB_NAME")
+debug = os.getenv("DEBUG", "False") == "True"
 
 # Start App
 todoApp = Flask(__name__)
@@ -45,6 +46,7 @@ todoApp.config['JWT_SECRET_KEY'] = secret_key
 todoApp.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 todoApp.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 todoApp.config['JWT_REFRESH_COOKIE_NAME'] = 'refresh_token'
+todoApp.config['JWT_COOKIE_CSRF_PROTECT'] = True
 
 # Initialize dependencies and db
 db.init_app(todoApp)
@@ -76,4 +78,4 @@ def route_not_found(_error):
 
 # Run app
 if __name__ == '__main__':
-    todoApp.run(debug=True, port=port)
+    todoApp.run(debug=debug, port=port)
