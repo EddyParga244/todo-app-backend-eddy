@@ -137,6 +137,10 @@ def reorder_todo():
     # Get data from frontend
     data = request.get_json().get("data")
 
+    # Verify data from frontend
+    if not data:
+        return jsonify({"message": "Todo required"}), 400
+
     # Get email from token
     user_id = get_jwt_identity()
 
