@@ -1,3 +1,4 @@
+import os
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -8,5 +9,5 @@ from flask_marshmallow import Marshmallow
 jwt = JWTManager()
 bcrypt = Bcrypt()
 marshmallow = Marshmallow()
-limiter = Limiter(get_remote_address)
+limiter = Limiter(get_remote_address, storage_uri=os.getenv("REDIS_URL"))
 scheduler = APScheduler()
