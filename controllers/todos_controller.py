@@ -1,5 +1,5 @@
 import uuid
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_jwt_extended import get_jwt_identity
 from marshmallow import ValidationError
 from sqlalchemy import func
@@ -90,6 +90,7 @@ def delete_todo(todo_id):
             return jsonify({"message": "Todo deleted successfully"}), 200
         except SQLAlchemyError as err:
             db.session.rollback()
+            current_app.logger.error("Error in %s %s: %s", request.method, request.url, err)
             return jsonify({"Error": f"{err}"}), 500
 
     return  jsonify({"message": "Todo doesn't belong to user"}), 400
@@ -127,6 +128,7 @@ def update_todo(todo_id):
 
         except SQLAlchemyError as err:
             db.session.rollback()
+            current_app.logger.error("Error in %s %s: %s", request.method, request.url, err)
             return jsonify({"Error": f"{err}"}), 500
 
     return  jsonify({"message": "Todo doesn't belong to user"}), 400

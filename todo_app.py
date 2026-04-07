@@ -29,8 +29,11 @@ db_name= os.getenv("DB_NAME")
 todoApp = Flask(__name__)
 
 # Log configurations
+todoApp.logger.setLevel(logging.ERROR)
 handler = RotatingFileHandler("todo_app.log", maxBytes=5000000, backupCount=3)
 handler.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
 todoApp.logger.addHandler(handler)
 
 # CORS
@@ -40,6 +43,8 @@ CORS(todoApp)
 todoApp.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
 todoApp.config['JWT_SECRET_KEY'] = secret_key
 todoApp.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
+todoApp.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
+todoApp.config['JWT_REFRESH_COOKIE_NAME'] = 'refresh_token'
 
 # Initialize dependencies and db
 db.init_app(todoApp)
@@ -47,7 +52,8 @@ bcrypt.init_app(todoApp)
 jwt.init_app(todoApp)
 limiter.init_app(todoApp)
 scheduler.init_app(todoApp)
-scheduler.start()
+if not todoApp.config.get('TESTING'):
+    scheduler.start()
 scheduler.add_job(id='cleanup', func=Cleanup, trigger='interval', hours=24, args=[todoApp])
 init_jwt_handlers(jwt)
 

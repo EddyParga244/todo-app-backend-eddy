@@ -11,6 +11,8 @@ def blacklist_tokens():
 
     # Get refresh token jti from cookie
     refresh_cookie = request.cookies.get('refresh_token')
+    if not refresh_cookie:
+        raise ValueError("Refresh token cookie missing")
     refresh_token = decode_token(refresh_cookie)
     refresh_jti = refresh_token['jti']
     expiration_refresh = datetime.fromtimestamp(refresh_token['exp'], tz=timezone.utc)

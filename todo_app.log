@@ -1,0 +1,2 @@
+2026-04-06 22:25:18,550 - ERROR - Error in DELETE http://localhost/api/todos/68444a0d-d0ed-40af-a927-3d3978339d59: Database error
+2026-04-06 22:25:26,127 - ERROR - Error in PATCH http://localhost/api/todos/3a9ae9fe-7a3c-4ea3-bc8e-42eca1565c0d: Database error

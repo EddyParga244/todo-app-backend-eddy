@@ -71,11 +71,14 @@ def login():
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Strict')
         return response
 
-    return  jsonify({"message": "Invalid credentials"}), 404
+    return  jsonify({"message": "Invalid credentials"}), 401
 
 def logout():
     # Blacklist access and refresh tokens
-    blacklist_tokens()
+    try:
+        blacklist_tokens()
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
     return jsonify({"message": "Logout successful"}), 200
 
 def change_password():
@@ -146,7 +149,10 @@ def delete_account():
         return jsonify(err.messages), 400
 
     # Delete user and blacklist tokens
-    blacklist_tokens()
+    try:
+        blacklist_tokens()
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
     db.session.delete(user_db)
     db.session.commit()
     return jsonify({"message": "User deleted successfully"}), 200

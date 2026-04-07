@@ -5,6 +5,8 @@
 This project is a backend for the Todo App, using Python and Flask library and MySQL for database, with features such as
 authentication, JWT, data persistence, rate limiting, blacklist, CORS, etc.
 
+Also includes 43 tests for auth and todo endpoints and an error logger.
+
 ## Tech Stack
 
 - Python
@@ -47,10 +49,14 @@ authentication, JWT, data persistence, rate limiting, blacklist, CORS, etc.
 6. Create database in MySQL
 7. Run server with `python app.py`
 8. Check error logs on `todo_app.log`
+9. Configure tests on `conftest.py`
+10. Run tests with `pytest -v`
 
 ## Tech decisions
 
 - Flask: Small project, no need for all the advantages of Django
+- Marshmallow: Schema validation to ensure data format consistency between frontend and backend
+- Rate Limiting: Applied only on auth endpoints to protect against brute force attacks
 - HTTP-only cookies: Protection againsts XSS attacks, no JavaScript access
 - UUID: Harder to brute force compared to incremental IDs
 - Blacklist: Integrated into database to persist revoked tokens
