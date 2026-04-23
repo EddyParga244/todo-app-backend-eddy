@@ -27,7 +27,7 @@ db_password= os.getenv("DB_PASSWORD")
 db_name= os.getenv("DB_NAME")
 db_ssl_ca = os.getenv("DB_SSL_CA")
 debug = os.getenv("DEBUG", "False") == "True"
-origins = os.environ.get("CORS_ORIGINS", " https://todo-app-backend-eddy.onrender.com")
+origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173")
 
 # SSL certificate
 ssl_ca_file = None
