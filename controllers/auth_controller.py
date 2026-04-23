@@ -68,7 +68,7 @@ def login():
         access_token = create_access_token(identity=email)
         refresh_token = create_refresh_token(identity=email)
         response = make_response(jsonify(access_token=access_token, refresh_token=refresh_token, message="Login successful"), 200)
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='None')
         return response
 
     return  jsonify({"message": "Invalid credentials"}), 401
@@ -155,5 +155,7 @@ def delete_account():
         return jsonify({"message": str(e)}), 400
     db.session.delete(user_db)
     db.session.commit()
-    return jsonify({"message": "User deleted successfully"}), 200
+    response = make_response(jsonify({"message": "User deleted successfully"}), 200)
+    response.delete_cookie('refresh_token')
+    return response
     

@@ -25,6 +25,7 @@ db_user= os.getenv("DB_USER")
 db_password= os.getenv("DB_PASSWORD")
 db_name= os.getenv("DB_NAME")
 debug = os.getenv("DEBUG", "False") == "True"
+origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173")
 
 # Start App
 todoApp = Flask(__name__)
@@ -38,7 +39,7 @@ handler.setFormatter(formatter)
 todoApp.logger.addHandler(handler)
 
 # CORS
-CORS(todoApp)
+CORS(todoApp, supports_credentials=True, origins=origins)
 
 # App configurations
 todoApp.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
@@ -46,7 +47,9 @@ todoApp.config['JWT_SECRET_KEY'] = secret_key
 todoApp.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 todoApp.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 todoApp.config['JWT_REFRESH_COOKIE_NAME'] = 'refresh_token'
-todoApp.config['JWT_COOKIE_CSRF_PROTECT'] = True
+todoApp.config['JWT_COOKIE_CSRF_PROTECT'] = False
+todoApp.config['JWT_COOKIE_SAMESITE'] = "None"
+todoApp.config['JWT_COOKIE_SECURE'] = True
 
 # Initialize dependencies and db
 db.init_app(todoApp)
