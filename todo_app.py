@@ -2,6 +2,7 @@ from logging.handlers import RotatingFileHandler
 import os
 import logging
 from datetime import timedelta
+import tempfile
 from flask import Flask, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -24,8 +25,22 @@ db_host= os.getenv("DB_HOST")
 db_user= os.getenv("DB_USER")
 db_password= os.getenv("DB_PASSWORD")
 db_name= os.getenv("DB_NAME")
+db_ssl_ca = os.getenv("DB_SSL_CA")
 debug = os.getenv("DEBUG", "False") == "True"
 origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173")
+
+# SSL certificate
+ssl_ca_file = None
+if db_ssl_ca:
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.crt', delete=False) as f:
+        f.write(db_ssl_ca)
+        ssl_ca_file = f.name
+
+# Database URI
+db_port = os.getenv("DB_PORT", "3306")
+db_uri = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+if ssl_ca_file:
+    db_uri += f'?ssl_ca={ssl_ca_file}'
 
 # Start App
 todoApp = Flask(__name__)
@@ -42,7 +57,7 @@ todoApp.logger.addHandler(handler)
 CORS(todoApp, supports_credentials=True, origins=origins)
 
 # App configurations
-todoApp.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
+todoApp.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 todoApp.config['JWT_SECRET_KEY'] = secret_key
 todoApp.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 todoApp.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
